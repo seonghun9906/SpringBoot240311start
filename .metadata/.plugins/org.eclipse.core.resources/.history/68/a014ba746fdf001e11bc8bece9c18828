@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>두번째 페이지</title>
+</head>
+<body>
+	<h1>두번째 HTML</h1>
+	
+	<p th:text="'날짜 : ' + ${date}"></p>
+	<p th:text=" ${'날짜 : ' +date}"></p>
+	<p>날짜 : [[${date}]]</p>
+	<p>[[${date}]]</p>
+	<!-- []/inner.text  -->
+	<p th:utext="${date}"></p>
+	<p>날짜 : [(${date})]</p>
+	<!-- ()/inner.html  -->
+	<!-- 위에 어느 방식이든 상관 없음. 능동적으로 사용 -->
+	<hr>
+	<h2>Map 데이터 출력</h2>
+	<ul>
+		<li th:text="'제품명 : ' + ${product.pname}"></li>
+		<li th:text="'제조사 : ' + ${product.brand}"></li>
+		<li>[[${product.price}]]</li>
+	</ul>
+	
+</body>
+</html>
