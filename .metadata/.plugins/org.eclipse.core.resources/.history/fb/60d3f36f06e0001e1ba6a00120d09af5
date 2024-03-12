@@ -1,0 +1,8 @@
+Thymeleaf
+
+1) 기본 사용법
+<html>에 xmlns:th 속성을 부여.
+	<html xmlns:th="http://www,thymeleaf.org">
+	
+2) 데이터 출력
+	표현식 : ${식별자}, @{url}, *{member_variable}
