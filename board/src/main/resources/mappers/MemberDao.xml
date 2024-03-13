@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- mapper 쓰려면 써야함 위의 형식 -->
+
+<mapper namespace="com.icia.board.dao.MemberDao">
+	<select id="selectPassword" parameterType="String" resultType="String">
+		SELECT m_pwd FROM member WHERE m_id=#{mid} <!-- mid 는 dao에 있는 변수 mid 와 같음 -->
+	</select>
+	
+	<select id="selectMember" parameterType="String" resultType="MemberDto">
+		SELECT * FROM minfo WHERE m_id=#{mid}
+	</select>
+</mapper>
