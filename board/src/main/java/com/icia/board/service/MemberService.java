@@ -1,6 +1,7 @@
 package com.icia.board.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -17,6 +18,9 @@ public class MemberService {
 	@Autowired
 	private MemberDao mDao;
 
+	// 비밀번호 암호화 인코더
+	private BCryptPasswordEncoder pEncoder = new BCryptPasswordEncoder();
+
 	public String loginProc(MemberDto member, HttpSession session, RedirectAttributes rttr) {
 		log.info("loginProc()");
 
@@ -26,7 +30,8 @@ public class MemberService {
 		String encPwd = mDao.selectPassword(member.getM_id());
 
 		if (encPwd != null) { // member가 존재함
-			if (encPwd.equals(member.getM_pwd())) {
+			// matches(평문-사용자입력값, 암호문-DB저장값)
+			if (pEncoder.matches(member.getM_pwd(), encPwd)) {
 				// 로그인 성공!
 				member = mDao.selectMember(member.getM_id());
 				// 세션에 로그인한 회원의 정보를 저장
@@ -44,6 +49,84 @@ public class MemberService {
 		}
 		rttr.addFlashAttribute("msg", msg);
 		return view;
+	}
+
+	public String idCheck(String mid) {
+		log.info("idCheck()");
+		String result = null;
+
+		int memCnt = mDao.selectId(mid);
+		if (memCnt == 0) {
+			result = "ok";
+		} else {
+			result = "fail";
+		}
+
+		return result;
+	}
+
+	public String memberJoin(MemberDto member, RedirectAttributes rttr) {
+		log.info("memberJoin()");
+		// 가입 성공 시 첫 페이지(또는 로그인 페이지)로, 실패 시 가입 페이지로 이동
+		String view = null;
+		String msg = null;
+
+		// 비밀번호 암호화 처리
+		String encPwd = pEncoder.encode(member.getM_pwd());
+		log.info(encPwd);
+		member.setM_pwd(encPwd);// 암호화된 비밀번호를 다시 저장.
+
+		try {
+			mDao.insertMember(member);
+			view = "redirect:/";
+			msg = "가입 성공";
+		} catch (Exception e) {
+			e.printStackTrace();
+			view = "redirect:joinForm";
+			msg = "가입 실패";
+
+		}
+
+		rttr.addFlashAttribute("msg", msg);
+		return view;
+	}
+
+	public String pwdChangeProc(MemberDto member, HttpSession session, RedirectAttributes rttr) {
+		log.info("pwdChangeProc()");
+		String view = null;
+		String msg = null;
+
+		String m_id = (String) session.getAttribute("m_id"); // mailService 에 있는 session.set("m_id")에 있는것이랑 똑같이
+		String encPwd = pEncoder.encode(member.getM_pwd()); // 암호화
+		if (m_id != null) {
+			member.setM_id(m_id);
+			member.setM_id(encPwd);
+
+			try {
+				mDao.updatePassowrd(member);
+				msg = "비밀번호 변경 성공";
+				view = "redirect:loginForm";
+
+			} catch (Exception e) {
+				System.out.println("pwdchangeProc() = " + m_id);
+				System.out.println("pwdchangeProc() = " + encPwd);
+
+				e.printStackTrace();
+				msg = "비밀번호 변경 실패";
+				view = "redirect:pwdChange";
+			}
+		}
+
+		rttr.addFlashAttribute("msg", msg);
+		
+		return view;
+	}
+
+	public String logout(HttpSession session, RedirectAttributes rttr) {
+		log.info("logout()");
+		session.invalidate();
+		rttr.addFlashAttribute("msg","로그아웃 되었습니다.");
+		return "redirect:/";
 	}
 
 }// class end

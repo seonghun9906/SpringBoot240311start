@@ -1,8 +1,0 @@
-<!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
-<body>
-<div th:fragment="header">
-	<a th:href="@{/}"><h2>Home title</h2></a>
-</div>
-</body>
-</html>
